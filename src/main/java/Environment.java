@@ -50,6 +50,7 @@ public class Environment {
     public void evolve(){
 
         //beeman para todas las particulas
+        List<Particle> temp = new ArrayList<>();
         for (int i = 0; i < particles.size() ; i++) {
 
             double prevAccelX = previousParticlesStatus.get(i).getFx() / previousParticlesStatus
@@ -74,15 +75,30 @@ public class Environment {
             previousParticlesStatus.get(i).setVx(particles.get(i).getVx());
             previousParticlesStatus.get(i).setVy(particles.get(i).getVy());
 
+
+            /*
             particles.get(i).setX(nextRx);
             particles.get(i).setY(nextRy);
             particles.get(i).setVx(nextVx);
             particles.get(i).setVy(nextVy);
 
-            particles.get(i).updateForces(particles,KN,KT,L,W,D);
+             */
 
-            double nextAccelX = particles.get(i).getFx() / particles.get(i).getMass();
-            double nextAccelY = particles.get(i).getFy() / particles.get(i).getMass();
+
+
+            Particle aux = new Particle(particles.get(i).getMass(),
+                    particles.get(i).getRadius(), nextRx,nextRy,
+                    nextVx,nextVy);
+
+            aux.setId(particles.get(i).getId());
+
+
+
+            aux.updateForces(particles,KN,KT,L,W,D);
+
+
+            double nextAccelX = aux.getFx() / particles.get(i).getMass();
+            double nextAccelY = aux.getFy() / particles.get(i).getMass();
 
             nextVx = particles.get(i).getVx() +(1.0/3.0)*nextAccelX*deltaT
                     + (5.0/6.0)*currAccelX*deltaT - (1.0/6.0)*prevAccelX*deltaT;
@@ -91,14 +107,21 @@ public class Environment {
                     + (5.0/6.0)*currAccelY*deltaT - (1.0/6.0)*prevAccelY*deltaT;
 
 
-            particles.get(i).setX(nextRx);
-            particles.get(i).setY(nextRy);
-            particles.get(i).setVx(nextVx);
-            particles.get(i).setVy(nextVy);
+            aux.setX(nextRx);
+            aux.setY(nextRy);
+            aux.setVx(nextVx);
+            aux.setVy(nextVy);
+            temp.add(aux);
         }
 
+        //actualizamos las particulas
+        this.previousParticlesStatus = this.particles;
+        this.particles = temp;
 
-        //detectar choques
+        System.out.println("actualizadas");
+
+
+        
 
     }
 

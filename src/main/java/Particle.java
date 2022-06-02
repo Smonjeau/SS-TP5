@@ -410,4 +410,8 @@ public class Particle {
     public void setVy(double vy) {
         this.vy = vy;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }
