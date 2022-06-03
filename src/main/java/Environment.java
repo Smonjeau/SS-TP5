@@ -2,6 +2,7 @@ import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Environment {
 
@@ -12,13 +13,18 @@ public class Environment {
     List<Particle> particles;
     List<Particle> previousParticlesStatus;
     List<Particle> recentlyRespawned;
+    Particle particleLeft, particleRight;
     public Environment(double l, double w, double d, List<Particle> particles) {
         this.previousParticlesStatus = new ArrayList<>();
         L = l;
         W = w;
         D = d;
         this.particles = particles;
-        this.deltaT = 0.1 * Math.sqrt(particles.get(0).getMass() / KN);
+        this.deltaT = 0.1 * Math.sqrt(particles.get(0).getMass() / KN) * 0.3;
+        System.out.println(deltaT);
+
+        this.particleLeft = new Particle(0, 0, W/2 - D/2, 0, 0, 0);
+        this.particleRight = new Particle(0, 0, W/2 + D/2, 0, 0, 0);
 
 
 
@@ -38,39 +44,39 @@ public class Environment {
         recentlyRespawned = new ArrayList<>();
 
 
-        System.out.println("adssa");
-        /*
 
-        double rxAnterior =  movingParticle.getX() + (-1*deltaT)*v0 + (Math.pow((-1*deltaT),2)/(2*M)) *f[0];
-        double ryAnterior = movingParticle.getY() + (Math.pow((-1*deltaT),2)/(2*M)) *f[1];
-        double vxAnterior = v0 + (-1*deltaT / M) * f[0];
-        double vyAnterior =  (-1*deltaT / M) * f[1];
-
-         */
 
     }
 
-    private double[] newCoords(Particle p) {
-        double initialX = p.getX();
-        double initialY = L-p.getRadius();
-        boolean restart = true;
-        while(restart){
-            restart = false;
-            for(Particle other : recentlyRespawned) {
-                if(p.overlaps(other)) {
-                    initialY += 2*p.getRadius();
+    private Particle newCoords(Particle p) {
+        boolean foundPlace = false, overlap;
+        Random random = new Random(System.currentTimeMillis());
+        Particle auxParticle = new Particle(p.getMass(),p.getRadius(),0,0,0,0);
+        auxParticle.setId(p.getId());
+        while(!foundPlace) {
+            overlap=false;
+            auxParticle.setX(p.getRadius() + (W - 2 * p.getRadius()) * random.nextDouble());
+            auxParticle.setY(L*0.8 + p.getRadius() + (L*0.45) * random.nextDouble());
+            for(Particle other : particles) {
+                if(other.getId() != auxParticle.getId() && auxParticle.overlaps(other)) {
+                    overlap = true;
                     break;
                 }
             }
+            if(!overlap)
+                foundPlace=true;
         }
-        return new double[]{initialX,initialY}; //No hay problema
+
+
+
+
+        return auxParticle;
     }
 
 
     public void evolve(){
         List<Particle> nextStep = new ArrayList<>();
         for (int i = 0; i < particles.size() ; i++) {
-
             double prevAccelX = previousParticlesStatus.get(i).getFx() / previousParticlesStatus
                     .get(i).getMass();
             double prevAccelY = previousParticlesStatus.get(i).getFy() / previousParticlesStatus
@@ -84,8 +90,6 @@ public class Environment {
             double nextRy = particles.get(i).getY() + particles.get(i).getVy() * deltaT +
                     ((2.0 / 3.0) * currAccelY - (1.0 / 6.0) * prevAccelY) * Math.pow(deltaT, 2);
 
-            if(Double.isNaN(nextRx) || Double.isNaN(nextRy))
-                System.out.println("F");
 
             double nextVx = particles.get(i).getVx() + (3.0 / 2.0) * currAccelX * deltaT - 0.5 * prevAccelX * deltaT;
             double nextVy = particles.get(i).getVy() + (3.0 / 2.0) * currAccelY * deltaT - 0.5 * prevAccelY * deltaT;
@@ -101,12 +105,12 @@ public class Environment {
 
             nextStep.add(futureParticle);
 
-            if(futureParticle.getY() < L*0.9)
+            if(futureParticle.getY() < L*0.8)
                 recentlyRespawned.remove(futureParticle);
         }
         for (int i = 0; i < nextStep.size() ; i++) {
             Particle futureParticle = nextStep.get(i);
-            futureParticle.updateForces(nextStep,KN,KT,L,W,D);
+            futureParticle.updateForces(nextStep, new Particle[]{particleLeft,particleRight}, KN,KT,L,W,D);
 
             double prevAccelX = previousParticlesStatus.get(i).getFx() / previousParticlesStatus
                     .get(i).getMass();
@@ -142,12 +146,9 @@ public class Environment {
         for (int i = 0; i < particles.size(); i++) {
             Particle p = particles.get(i);
             if(p.getY() <= -L/10) {
-                double[] newCoords = this.newCoords(p);
-                p.setX(newCoords[0]);
-                p.setY(newCoords[1]);
-                p.setVy(0);
-                p.setVx(0);
-                double rxAnterior =  p.getX() +  (Math.pow((-1*deltaT),2)/(2*p.getMass())) *p.getFx();
+                p = this.newCoords(p);
+                particles.set(i, p);
+                double rxAnterior = p.getX() +  (Math.pow((-1*deltaT),2)/(2*p.getMass())) *p.getFx();
                 double ryAnterior = p.getY() + (Math.pow((-1*deltaT),2)/(2*p.getMass())) *p.getFy();
                 double vxAnterior = (-1*deltaT / p.getMass()) * p.getFx();
                 double vyAnterior =  (-1*deltaT / p.getMass()) * p.getFy();
@@ -155,8 +156,12 @@ public class Environment {
                 previousParticlesStatus.get(i).setY(ryAnterior);
                 previousParticlesStatus.get(i).setVx(vxAnterior);
                 previousParticlesStatus.get(i).setVy(vyAnterior);
+                previousParticlesStatus.get(i).setFx(0);
+                previousParticlesStatus.get(i).setFy(0);
 
                 recentlyRespawned.add(p);
+
+
             }
         }
 
@@ -172,7 +177,7 @@ public class Environment {
 
     private void calculateParticlesForces(){
         for (Particle p : this.particles){
-            p.updateForces(particles,KN,KT,L,W,D);
+            p.updateForces(particles, new Particle[]{particleLeft,particleRight}, KN,KT,L,W,D);
         }
 
         System.out.println("termine");
@@ -183,7 +188,7 @@ public class Environment {
     int count = 0;
 
     public boolean stopCriteria(){
-        return count++ == 7000;
+        return count++ == 80000;
     }
 
 
