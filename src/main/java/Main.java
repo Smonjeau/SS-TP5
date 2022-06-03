@@ -16,17 +16,27 @@ public class Main {
         File file = new File("dynamic_output.txt");
         File fileOvito = new File("ovito.xyz"); //TODO sacar
         PrintWriter pw = new PrintWriter(fileOvito);
+        pw.println(environment.particles.size());
+        pw.println();
+
+        for(Particle p : environment.particles)
+            pw.printf("%s %s %s %s %s\n", df.format(p.getX()),
+                    df.format(p.getY()),df.format(p.getVx()),df.format(p.getVy()),
+                    df.format(p.getRadius()));
         while(!environment.stopCriteria()){
+
             environment.evolve();
             pw.println(environment.particles.size());
             pw.println();
+
+            for(Particle p : environment.particles)
+                pw.printf("%s %s %s %s %s\n", df.format(p.getX()),
+                        df.format(p.getY()),df.format(p.getVx()),df.format(p.getVy()),
+                        df.format(p.getRadius()));
+
             //pw.println("x,y,vx,vy,radius");
 
 
-            for(Particle p : environment.particles)
-                pw.printf("%s %s %s %s %s\n",df.format(p.getX()),
-                        df.format(p.getY()),df.format(p.getVx()),df.format(p.getVy()),
-                        df.format(p.getRadius()));
         }
 
 

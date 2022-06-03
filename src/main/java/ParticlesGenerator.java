@@ -13,12 +13,12 @@ public class ParticlesGenerator {
         Config config = new Config("static_input.txt");
         long startTime = System.currentTimeMillis();
 
-        //TODO ponerlo mejó
         double L = config.getHeightLength();
         double W = config.getWidthLength();
         List<Particle> particles = new ArrayList<>();
         Random random = new Random(System.currentTimeMillis());
-        while(System.currentTimeMillis()<startTime + 10000){
+        while(particles.size() < 300){
+
             double radius = 0.01 + (0.015 - 0.01) * random.nextDouble();
             double x = radius + (W - 2 * radius) * random.nextDouble();
             double y = radius + (L - 2 * radius) * random.nextDouble();
