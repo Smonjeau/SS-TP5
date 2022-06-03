@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.Objects;
 
 public class Particle {
     private double mass,radius,x,y,vx,vy,fx,fy;
@@ -47,6 +48,8 @@ public class Particle {
 
     public double getFn(Particle p,double KN){
         double superposition = this.getRadius() + p.getRadius() - this.distanceFromParticle(p);
+        if(superposition<0)
+            return 0;
 
         return -1 * KN * superposition;
     }
@@ -57,20 +60,17 @@ public class Particle {
 
         double velNormalX,velNormalY;
 
-        if(p.getVx() == 0 && this.vx == 0 && p.vy == 0 && this.vy == 0){
-            velNormalX  = 0;
-            velNormalY = 0;
-        }
-        else {
-            velNormalX = (p.getVx() - this.vx) /
-                    (Math.sqrt(Math.pow(p.getVx() - this.vx, 2) + Math.pow(p.getVy() - this.vy, 2)));
 
-            velNormalY = (p.getVy() - this.vy) /
-                    (Math.sqrt(Math.pow(p.getVx() - this.vx, 2) + Math.pow(p.getVy() - this.vy, 2)));
+        velNormalX = (p.getX() - this.getX()) /
+                (Math.sqrt(Math.pow(p.getX() - this.getX(), 2) + Math.pow(p.getY() - this.getY(), 2)));
+
+        velNormalY = (p.getY() - this.getY()) /
+                (Math.sqrt(Math.pow(p.getX() - this.getX(), 2) + Math.pow(p.getY() - this.getY(), 2)));
 
 
-        }
         double superposition = this.getRadius() + p.getRadius() - this.distanceFromParticle(p);
+        if(superposition < 0)
+            return 0;
 
         double velTang = -1*velNormalY*relVelX + velNormalX * relVelY;
 
@@ -119,8 +119,8 @@ public class Particle {
         //sumamos la fuerza normal y tangencial proyectada a la componente x
 
         //primero las particulas
-        double fnAccumProjectedY = 0;
-        double ftAccumProjectedY = 0;
+        double fAccumProjectedY = 0;
+
         for(Particle p : particles){
             if(this.id == p.id)
                 continue;
@@ -130,8 +130,8 @@ public class Particle {
 
             double normalVersorY = (p.y - this.y)  /
                     (Math.sqrt(Math.pow(p.x-this.x,2) + Math.pow(p.y-this.y,2)));
-            fnAccumProjectedY += getFn(p,KN) * normalVersorY;
-            ftAccumProjectedY += getFt(p,KT) *  normalVersorX;
+            fAccumProjectedY += getFn(p,KN) * normalVersorY;
+            fAccumProjectedY += getFt(p,KT) *  normalVersorX;
 
         }
         //ahora las paredes
@@ -139,112 +139,130 @@ public class Particle {
         double relVelX = this.vx;
         double relVelY = this.vy;
 
-        double velNormalX,velNormalY;
-
-        if( this.vx == 0  && this.vy == 0){
-            velNormalX  = 0;
-            velNormalY = 0;
-        }else {
-
-            velNormalX = (this.vx) / (Math.sqrt(Math.pow(this.vx, 2) + Math.pow(this.vy, 2)));
-
-            velNormalY = (this.vy) / (Math.sqrt(Math.pow(this.vx, 2) + Math.pow(this.vy, 2)));
-        }
+        double cos, sen, velTang;
 
 
-        double velTang = -1*velNormalY*relVelX + velNormalX * relVelY;
+
+
+        //TODO ver que hacer en los casos de pegar en el bordecito
+        int contador = 0;
+
         for(Wall w : Wall.values()){
             double superposition;
             double normalVersorX,normalVersorY;
             switch(w){
-                case UPPER:
-                    //la pos en x es la misma
-                    normalVersorX = 0;
-
-                    normalVersorY = (L - this.y)  /
-                            (Math.sqrt(Math.pow(L-this.y,2)));
-                    superposition = this.getRadius() - (L - this.y);
-                    fnAccumProjectedY += -1*KN*superposition*normalVersorY;
-                    ftAccumProjectedY += -1 * KT * superposition * velTang * normalVersorX;
-                    break;
                 case LEFT:
-                    normalVersorX = (0 - this.x)  /
-                            (Math.sqrt(Math.pow(0-this.x,2) ));
+                    //superposition = this.getRadius() - (0-this.x);
+                    //cos = (this.vx) / (Math.sqrt(Math.pow(this.vx, 2) + Math.pow(this.vy, 2)));
+
+                    //sen = (this.vy) / (Math.sqrt(Math.pow(this.vx, 2) + Math.pow(this.vy, 2)));
+                    //velTang = -1*velNormalY*relVelX + velNormalX * relVelY;
+                    //normalVersorX = (0 - this.x)  /
+                      //      (Math.sqrt(Math.pow(0-this.x,2) ));
 
                     //la pos en y es la misma
-                    normalVersorY = 0;
-                    superposition = this.getRadius() - (0-this.x);
-                    fnAccumProjectedY += -1*KN*superposition*normalVersorY;
-                    ftAccumProjectedY += -1 * KT * superposition * velTang * normalVersorX;
+                    //normalVersorY = 0;
+                    //
+                    //fnAccumProjectedY += -1*KN*superposition*normalVersorY;
+                    //fAccumProjectedY += -1 * KT * superposition * velTang * normalVersorX;
 
                     break;
                 case RIGHT:
-                    normalVersorX = (W - this.x)  /
-                            (Math.sqrt(Math.pow(W-this.x,2) ));
+                    //velNormalX = (this.vx) / (Math.sqrt(Math.pow(this.vx, 2) + Math.pow(this.vy, 2)));
+
+                    //velNormalY = (this.vy) / (Math.sqrt(Math.pow(this.vx, 2) + Math.pow(this.vy, 2)));
+                    //velTang = -1*velNormalY*relVelX + velNormalX * relVelY;
+                    //normalVersorX = (W - this.x)  /
+                      //      (Math.sqrt(Math.pow(W-this.x,2) ));
 
                     //la pos en y es la misma
-                    normalVersorY = 0;
-                    superposition = this.getRadius() - (W - this.x);
-                    fnAccumProjectedY += -1*KN*superposition*normalVersorY;
-                    ftAccumProjectedY += -1 * KT * superposition * velTang * normalVersorX;
+                    //normalVersorY = 0;
+                    //superposition = this.getRadius() - (W - this.x);
+                    //fnAccumProjectedY += -1*KN*superposition*normalVersorY;
+                    //ftAccumProjectedY += -1 * KT * superposition * velTang * normalVersorX;
                     break;
                 case LOWER_LEFT:
-                    if(this.x <= W/2 - D/2) {
-                        superposition = this.getRadius() - (0 - this.y);
+                    superposition = this.getRadius() - this.y;
+                    if (superposition < 0 || this.x > (W/2 - D/2))
+                        break;
+                    contador++;
+
+                    //velNormalX = (this.vx) / (Math.sqrt(Math.pow(this.vx, 2) + Math.pow(this.vy, 2)));
+
+                    //velNormalY = (this.vy) / (Math.sqrt(Math.pow(this.vx, 2) + Math.pow(this.vy, 2)));
+                    //velTang = -1*velNormalY*relVelX + velNormalX * relVelY;
+                    //if(this.x <= W/2 - D/2) {
+                      //  superposition = this.getRadius() - (0 - this.y);
                         //la pos en x es la misma
-                        normalVersorX = 0;
+                        //normalVersorX = 0;
 
-                        normalVersorY = (0 - this.y)  /
-                                (Math.sqrt(Math.pow(0-this.y,2)));
-                    }
-                    else {
-                        normalVersorX = (W / 2 - D / 2 - this.x)  /
-                                (Math.sqrt(Math.pow(W / 2 - D / 2-this.x,2) +
-                                        Math.pow(0-this.y,2)));
+                        //normalVersorY = (0 - this.y)  /
+                          //      (Math.sqrt(Math.pow(0-this.y,2)));
+                    //}
+                    //else {
+                      //  normalVersorX = (W / 2 - D / 2 - this.x)  /
+                        //        (Math.sqrt(Math.pow(W / 2 - D / 2-this.x,2) +
+                          //              Math.pow(0-this.y,2)));
 
-                        normalVersorY = (0 - this.y)  /
-                                (Math.sqrt(Math.pow(W / 2 - D / 2 -this.x,2)
-                                        + Math.pow(0-this.y,2)));
+                        //normalVersorY = (0 - this.y)  /
+                          //      (Math.sqrt(Math.pow(W / 2 - D / 2 -this.x,2)
+                            //            + Math.pow(0-this.y,2)));
 
-                        superposition = this.getRadius() - this.distanceFromParticle(new Particle(
-                                0, 0, W / 2 - D / 2, 0, 0, 0
-                        ));
-                    }
-                    fnAccumProjectedY += -1*KN*superposition*normalVersorY;
-                    ftAccumProjectedY += -1 * KT * superposition * velTang * normalVersorX;
+                        //superposition = this.getRadius() - this.distanceFromParticle(new Particle(
+                          //      0, 0, W / 2 - D / 2, 0, 0, 0
+                        //));
+                    //}
+                    normalVersorY = (0 - this.y)  /
+                                  (Math.sqrt(Math.pow(0-this.y,2)));
+
+                    fAccumProjectedY += -1*KN*superposition*normalVersorY;
+                    //ftAccumProjectedY += -1 * KT * superposition * velTang * normalVersorX;
 
                     break;
                 case LOWER_RIGHT:
-                    if(this.x>= W/2 + D/2) {
-                        superposition = this.getRadius() - (0 - this.y);
-                        //la pos en x es la misma
-                        normalVersorX = 0;
-
-                        normalVersorY = (0 - this.y)  /
+                    superposition = this.getRadius() - this.y;
+                    if (superposition < 0 || this.x < (W/2 + D/2))
+                        break;
+                    contador++;
+//                    velNormalX = (this.vx) / (Math.sqrt(Math.pow(this.vx, 2) + Math.pow(this.vy, 2)));
+//
+//                    velNormalY = (this.vy) / (Math.sqrt(Math.pow(this.vx, 2) + Math.pow(this.vy, 2)));
+//                    velTang = -1*velNormalY*relVelX + velNormalX * relVelY;
+//                    if(this.x>= W/2 + D/2) {
+//                        superposition = this.getRadius() - (0 - this.y);
+//                        //la pos en x es la misma
+//                        normalVersorX = 0;
+//
+//                        normalVersorY = (0 - this.y)  /
+//                                (Math.sqrt(Math.pow(0-this.y,2)));
+//                    }
+//                    else {
+//                        superposition = this.getRadius() - this.distanceFromParticle(new Particle(
+//                                0, 0, W / 2 + D / 2, 0, 0, 0
+//                        ));
+//
+//                        normalVersorX = (W / 2 + D / 2 - this.x)  /
+//                                (Math.sqrt(Math.pow(W / 2 + D / 2-this.x,2) +
+//                                        Math.pow(0-this.y,2)));
+//
+//                        normalVersorY = (0 - this.y)  /
+//                                (Math.sqrt(Math.pow(W / 2 + D / 2 -this.x,2)
+//                                        + Math.pow(0-this.y,2)));
+//                    }
+                    normalVersorY = (0 - this.y)  /
                                 (Math.sqrt(Math.pow(0-this.y,2)));
-                    }
-                    else {
-                        superposition = this.getRadius() - this.distanceFromParticle(new Particle(
-                                0, 0, W / 2 + D / 2, 0, 0, 0
-                        ));
-
-                        normalVersorX = (W / 2 + D / 2 - this.x)  /
-                                (Math.sqrt(Math.pow(W / 2 + D / 2-this.x,2) +
-                                        Math.pow(0-this.y,2)));
-
-                        normalVersorY = (0 - this.y)  /
-                                (Math.sqrt(Math.pow(W / 2 + D / 2 -this.x,2)
-                                        + Math.pow(0-this.y,2)));
-                    }
-                    fnAccumProjectedY += -1*KN*superposition*normalVersorY;
-                    ftAccumProjectedY += -1 * KT * superposition * velTang * normalVersorX;
+                    fAccumProjectedY += -1*KN*superposition*normalVersorY;
+                    //ftAccumProjectedY += -1 * KT * superposition * velTang * normalVersorX;
                     break;
 
 
             }
         }
-
-        return fnAccumProjectedY + ftAccumProjectedY + this.mass * (- 9.80665);
+        if(contador>1) {
+            System.out.println("Se cago en proyeccion Y");
+            System.out.println(this.getX() + " " + this.getY());
+        }
+        return fAccumProjectedY + this.mass * (- 9.80665);
     }
 
 
@@ -252,8 +270,7 @@ public class Particle {
         //sumamos la fuerza normal y tangencial proyectada a la componente x
 
         //primero las particulas
-        double fnAccumProjectedX = 0;
-        double ftAccumProjectedX = 0;
+        double fAccumProjectedX = 0;
         for(Particle p : particles){
             if(this.id == p.id)
                 continue;
@@ -263,63 +280,83 @@ public class Particle {
 
             double normalVersorY = (p.y - this.y)  /
                     (Math.sqrt(Math.pow(p.x-this.x,2) + Math.pow(p.y-this.y,2)));
-            fnAccumProjectedX += getFn(p,KN) * normalVersorX ;
-            ftAccumProjectedX += getFt(p,KT) * -1* normalVersorY;
+            fAccumProjectedX += getFn(p,KN) * normalVersorX ; //Fuerza normal proyectada en X
+            fAccumProjectedX += getFt(p,KT) * -1* normalVersorY; //Fuerza tangencial proyectada en X
 
         }
         //ahora las paredes
 
         double relVelX = this.vx;
         double relVelY = this.vy;
-        double velNormalX,velNormalY;
+        double cos, sen;
 
-        if( this.vx == 0  && this.vy == 0){
-            velNormalX  = 0;
-            velNormalY = 0;
-        }else {
 
-            velNormalX = (this.vx) / (Math.sqrt(Math.pow(this.vx, 2) + Math.pow(this.vy, 2)));
 
-            velNormalY = (this.vy) / (Math.sqrt(Math.pow(this.vx, 2) + Math.pow(this.vy, 2)));
+        double superposition = this.getRadius() - this.x;
+        if(superposition >= 0) {
+            //LEFT
+            fAccumProjectedX += KN*superposition;
+           // if(fAccumProjectedX<0)
+             //   System.out.println("dio negativo bro");
+        } else {
+            superposition = this.getRadius() - (W - this.x);
+            if(superposition >= 0) {
+                //RIGHT
+                fAccumProjectedX += -1*KN*superposition;
+            }
         }
-        double velTang = -1*velNormalY*relVelX + velNormalX * relVelY;
-        for(Wall w : Wall.values()){
-            double superposition;
-            double normalVersorX,normalVersorY;
-            switch(w){
-                case UPPER:
-                    //la pos en x es la misma
-                    normalVersorX = 0;
 
-                    normalVersorY = (L - this.y)  /
-                            (Math.sqrt(Math.pow(L-this.y,2)));
-                    superposition = this.getRadius() - (L - this.y);
-                    fnAccumProjectedX += -1*KN*superposition*normalVersorX;
-                    ftAccumProjectedX += -1 * KT * superposition * velTang * -1 * normalVersorY;
-                    break;
-                case LEFT:
-                    normalVersorX = (0 - this.x)  /
-                            (Math.sqrt(Math.pow(0-this.x,2) ));
+        //int contador = 0;
+        //for(Wall w : Wall.values()){
+          //  double superposition;
+            //double normalVersorX,normalVersorY;
+            //switch(w){
+              //  case LEFT:
+                //    superposition = this.getRadius() - this.x;
+                  //  if(superposition < 0)
+                    //    break;
+                    //contador++;
+                    //Tiempo hasta choque
+                    //double yFinal = this.getVy()* (this.getX()/this.vx);
+                    //double hip = (Math.sqrt(Math.pow(this.getX(), 2) + Math.pow(this.getY()-yFinal, 2)));
+                    //cos = (this.getX()) / hip;
+                    //sen = (this.getY()-yFinal) / hip;
 
-                    //la pos en y es la misma
-                    normalVersorY = 0;
-                    superposition = this.getRadius() - (0-this.x);
-                    fnAccumProjectedX += -1*KN*superposition * normalVersorX;
-                    ftAccumProjectedX += -1 * KT * superposition * velTang * -1 * normalVersorY;
-
-                    break;
-                case RIGHT:
-                    normalVersorX = (W - this.x)  /
-                            (Math.sqrt(Math.pow(W-this.x,2) ));
+                    //double velTang = -1*sen*relVelX + cos * relVelY;
+                    //double velTang = this.getVy();
 
                     //la pos en y es la misma
-                    normalVersorY = 0;
-                    superposition = this.getRadius() - (W - this.x);
-                    fnAccumProjectedX += -1*KN*superposition * normalVersorX;
-                    ftAccumProjectedX += -1 * KT * superposition * velTang * -1 * normalVersorY;
-                    break;
-                case LOWER_LEFT:
-                    if(this.x <= W/2 - D/2) {
+                    //normalVersorY = 0;
+
+
+                    //fAccumProjectedX += -1 * KT * superposition * velTang * -1 * normalVersorY;
+
+
+                   // break;
+              //  case RIGHT:
+                //    superposition = this.getRadius() - (W - this.x);
+                //    if(superposition < 0)
+                 //       break;
+                //    contador++;
+                    //cos = (this.getX()) / (Math.sqrt(Math.pow(this.getX(), 2) + Math.pow(this.getY(), 2)));
+                    //sen = (this.getY()) / (Math.sqrt(Math.pow(this.getX(), 2) + Math.pow(this.getY(), 2)));
+                    //double velTang = -1*velNormalY*relVelX + velNormalX * relVelY;
+                    //normalVersorX = (W - this.x)  /
+                      //      (Math.sqrt(Math.pow(W-this.x,2) ));
+
+                    //la pos en y es la misma
+                    //normalVersorY = 0;
+
+                 //   fAccumProjectedX += -1*KN*superposition;
+                    //ftAccumProjectedX += -1 * KT * superposition * velTang * -1 * normalVersorY;
+                 //   break;
+              //  case LOWER_LEFT:
+                    //if(this.getX() < (W/2 - D/2 + this.getRadius()))
+
+                    //velNormalX = (this.getX()) / (Math.sqrt(Math.pow(this.getX(), 2) + Math.pow(this.getY(), 2)));
+                    //velNormalY = (this.getY()) / (Math.sqrt(Math.pow(this.getX(), 2) + Math.pow(this.getY(), 2)));
+                    //double velTang = -1*velNormalY*relVelX + velNormalX * relVelY;
+                    /*if(this.x <= W/2 - D/2) {
                         superposition = this.getRadius() - (0 - this.y);
                         //la pos en x es la misma
                         normalVersorX = 0;
@@ -339,12 +376,15 @@ public class Particle {
                         superposition = this.getRadius() - this.distanceFromParticle(new Particle(
                                 0, 0, W / 2 - D / 2, 0, 0, 0
                         ));
-                    }
-                    fnAccumProjectedX += -1*KN*superposition * normalVersorX;
-                    ftAccumProjectedX += -1 * KT * superposition * velTang * -1 * normalVersorY;
+                    }*/
+                    //fnAccumProjectedX += -1*KN*superposition * normalVersorX;
+                    //ftAccumProjectedX += -1 * KT * superposition * velTang * -1 * normalVersorY;
 
-                    break;
-                case LOWER_RIGHT:
+                //    break;
+             //   case LOWER_RIGHT:
+                    /*velNormalX = (this.getX()) / (Math.sqrt(Math.pow(this.getX(), 2) + Math.pow(this.getY(), 2)));
+                    velNormalY = (this.getY()) / (Math.sqrt(Math.pow(this.getX(), 2) + Math.pow(this.getY(), 2)));
+                    double velTang = -1*velNormalY*relVelX + velNormalX * relVelY;
                     if(this.x>= W/2 + D/2) {
                         superposition = this.getRadius() - (0 - this.y);
                         //la pos en x es la misma
@@ -367,21 +407,39 @@ public class Particle {
                                         + Math.pow(0-this.y,2)));
                     }
                     fnAccumProjectedX += -1*KN*superposition * normalVersorX;
-                    ftAccumProjectedX += -1 * KT * superposition * velTang * -1 * normalVersorY;
-                    break;
+                    ftAccumProjectedX += -1 * KT * superposition * velTang * -1 * normalVersorY;*/
+               //     break;
 
 
-            }
-        }
+            //}
+        //}
 
-        return fnAccumProjectedX + ftAccumProjectedX;
+
+        //if(contador>1) {
+       //     System.out.println("Se cago en proyeccion X");
+       //     System.out.println(this.getX() + " " + this.getY());
+       // }
+
+
+        return fAccumProjectedX;
     }
     public void updateForces(List<Particle> particles, double KN, double KT,double L, double W, double D){
 
         this.fx = calculateXForceProjection(particles, KN, KT, L, W, D);
         this.fy = calculateYForceProjection(particles, KN, KT, L, W, D);
+        if(Double.isNaN(this.fx) || Double.isNaN(this.fy))
+            System.out.println("isnan");
 
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Particle particle = (Particle) o;
+        return id == particle.id;
+    }
+
 
     public double getFx() {
         return fx;

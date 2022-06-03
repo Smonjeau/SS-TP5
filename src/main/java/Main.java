@@ -14,13 +14,17 @@ public class Main {
         DecimalFormat df = new DecimalFormat("#.0000",
                 DecimalFormatSymbols.getInstance(Locale.US));
         File file = new File("dynamic_output.txt");
-        PrintWriter pw = new PrintWriter(file);
+        File fileOvito = new File("ovito.xyz"); //TODO sacar
+        PrintWriter pw = new PrintWriter(fileOvito);
         while(!environment.stopCriteria()){
             environment.evolve();
-            pw.println("x,y,vx,vy,radius");
+            pw.println(environment.particles.size());
+            pw.println();
+            //pw.println("x,y,vx,vy,radius");
+
 
             for(Particle p : environment.particles)
-                pw.printf("%s,%s,%s,%s,%s\n",df.format(p.getX()),
+                pw.printf("%s %s %s %s %s\n",df.format(p.getX()),
                         df.format(p.getY()),df.format(p.getVx()),df.format(p.getVy()),
                         df.format(p.getRadius()));
         }
