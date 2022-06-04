@@ -1,3 +1,4 @@
+import pandas as pd
 import math
 import numpy as np
 from cProfile import label
@@ -47,7 +48,7 @@ for i in range(len(run1)):
 # plt.savefig('ej1_graphs.1.1.png')
 # plt.clf()
 
-for i in range(5):
+for i in range(7):
     run1.pop(0)
     run2.pop(0)
     run3.pop(0)
@@ -90,18 +91,45 @@ def Error(diam,k,expected):
     return error
 
 error=[]
-LOWER=14
-UPPER=18
-STEP=0.01
+LOWER=16
+UPPER=17
+STEP=0.001
 for i in np.arange(LOWER,UPPER,STEP):
     error.append(Error(D,i,expected_values))
 
-plt.plot(np.arange(LOWER,UPPER,STEP),error)
-plt.savefig('ej1_graphs.2.1.png')
-plt.clf()
+# plt.plot(np.arange(LOWER,UPPER,STEP),error)
+# plt.savefig('ej1_graphs.2.1.png')
+# plt.clf()
 
 print(min(error))
-print("min error found at k="+str(LOWER+STEP*error.index(float(min(error)))))
-# for i in range(LOWER,UPPER,STEP):
-#     print(i,Error(D,i,expected_values))
-# print(error)
+optimum_k=LOWER+STEP*error.index(float(min(error)))
+print("min error found at k="+str(optimum_k))
+
+def f(x):
+    B=(300/0.3)*(9.81)**0.5
+    aux=(abs(x-optimum_k*mean_radii))**1.5
+    return B*aux
+
+
+plt.errorbar(scatterx,scattery,yerr=scatterError,fmt='o')
+x=np.arange(0.15,0.25,0.01)
+plt.plot(x,f(x),color='red')
+plt.xlabel('D')
+plt.ylabel('Flujo de particulas cada 10000 DT')
+plt.savefig('ej1_graphs.2.2.png')
+plt.clf()
+
+
+data=pd.read_csv('dynamic_output_energy.txt',delimiter=',')
+
+
+# plt.plot(range(0,320000,1),data['D0'],label='D=0.15')
+# plt.plot(range(0,320000,1),data['D1'],label='D=0.1833')
+# plt.plot(range(0,320000,1),data['D2'],label='D=0.2166')
+# plt.plot(range(0,320000,1),data['D3'],label='D=0.25')
+# plt.xlabel('DT')
+# plt.ylabel('Energia')
+# plt.legend()
+# plt.yscale('log')
+# plt.savefig('ej1_graphs.3.1.png')
+# plt.clf()
