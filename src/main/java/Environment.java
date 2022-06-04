@@ -14,6 +14,9 @@ public class Environment {
     List<Particle> previousParticlesStatus;
     List<Particle> recentlyRespawned;
     Particle particleLeft, particleRight;
+
+    List<Integer> flowrate;
+    private int respawnCount=0;
     public Environment(double l, double w, double d, List<Particle> particles) {
         this.previousParticlesStatus = new ArrayList<>();
         L = l;
@@ -42,6 +45,7 @@ public class Environment {
         }
 
         recentlyRespawned = new ArrayList<>();
+        flowrate=new ArrayList<>();
 
 
 
@@ -163,8 +167,14 @@ public class Environment {
 
 
             }
-        }
 
+        }
+        respawnCount+=recentlyRespawned.size();
+        if (count!=0&&count%100==0){
+            flowrate.add(respawnCount);
+            respawnCount=0;
+            System.out.println(count);
+        }
 
 
         //System.out.println("actualizadas");
@@ -191,6 +201,7 @@ public class Environment {
         return count++ == 80000;
     }
 
-
-
+    public List<Integer> getFlowrate() {
+        return flowrate;
+    }
 }
