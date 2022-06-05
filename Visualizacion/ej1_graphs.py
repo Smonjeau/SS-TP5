@@ -1,3 +1,4 @@
+from turtle import color
 import pandas as pd
 import math
 import numpy as np
@@ -105,8 +106,8 @@ for i in np.arange(LOWER,UPPER,STEP):
     error.append(Error(D,i,expected_values))
 
 optimum_k=LOWER+STEP*error.index(float(min(error)))
-plt.plot(np.arange(LOWER,UPPER,STEP),error)
-plt.axvline(x=optimum_k, color='b', label='C='+str(optimum_k))
+plt.plot(np.arange(LOWER,UPPER,STEP),error,color='red')
+plt.axvline(x=optimum_k, color='b', label='C='+'{:.2f}'.format(optimum_k))
 plt.xlabel('C')
 plt.ylabel('Error')
 plt.legend()
@@ -160,9 +161,9 @@ plt.clf()
 
 data=pd.read_csv('dynamic_output_closed_energy.txt',delimiter=',')
 
-plt.plot(xAxis,data['KT1'],label='KT=KN')
-plt.plot(xAxis,data['KT2'],label='KT=2KN')
-plt.plot(xAxis,data['KT3'],label='KT=3KN')
+plt.plot(xAxis,data['KT1'],label='KT=10^5')
+plt.plot(xAxis,data['KT2'],label='KT=2*10^5')
+plt.plot(xAxis,data['KT3'],label='KT=3*10^5')
 plt.xlabel('Tiempo de simulacion (s)')
 plt.ylabel('Energia (j)')
 plt.legend()
