@@ -29,26 +29,28 @@ run2=readAndAdjustIntoList("dynamic_output_1.txt")
 run3=readAndAdjustIntoList("dynamic_output_2.txt")
 run4=readAndAdjustIntoList("dynamic_output_3.txt")
 
+DT=0.1 * (0.01 / 10**5)**0.5 * 0.3
+
 xAxis=[]
 for i in range(len(run1)):
-    xAxis.append(i*10000)
+    xAxis.append(DT*i*10000)
 
 for i in range(len(run1)):
-    run1[i]=run1[i]/( 0.1 * (0.01 / 10**5)**0.5 * 0.3*10000)
-    run2[i]=run2[i]/( 0.1 * (0.01 / 10**5)**0.5 * 0.3*10000)
-    run3[i]=run3[i]/( 0.1 * (0.01 / 10**5)**0.5 * 0.3*10000)
-    run4[i]=run4[i]/( 0.1 * (0.01 / 10**5)**0.5 * 0.3*10000)
-
+    run1[i]=run1[i]/(DT*10000)
+    run2[i]=run2[i]/(DT*10000)
+    run3[i]=run3[i]/(DT*10000)
+    run4[i]=run4[i]/(DT*10000)
   
 
 plt.plot(xAxis,run1,label='D=0.15')
 plt.plot(xAxis,run2,label='D=0.1833')
 plt.plot(xAxis,run3,label='D=0.2166')
 plt.plot(xAxis,run4,label='D=0.25')
-plt.xlabel('DT')
-plt.ylabel('Flujo de particulas cada 10000 DT')
-plt.show()
+plt.legend()
+plt.xlabel('Tiempo de simulacion (s)')
+plt.ylabel('Flujo de particulas (m/s)')
 plt.savefig('ej1_graphs.1.1.png')
+plt.show()
 plt.clf()
 
 
@@ -63,8 +65,8 @@ scattery=[stat.mean(run1),stat.mean(run2),stat.mean(run3),stat.mean(run4)]
 scatterError=[stat.stdev(run1),stat.stdev(run2),stat.stdev(run3),stat.stdev(run4)]
 
 plt.errorbar(scatterx,scattery,yerr=scatterError,fmt='o')
-plt.xlabel('D')
-plt.ylabel('Flujo de particulas cada 10000 DT')
+plt.xlabel('D (m)')
+plt.ylabel('Flujo de particulas (m/s)')
 plt.savefig('ej1_graphs.1.2.png')
 plt.show()
 plt.clf()
@@ -102,14 +104,19 @@ STEP=0.01
 for i in np.arange(LOWER,UPPER,STEP):
     error.append(Error(D,i,expected_values))
 
+optimum_k=LOWER+STEP*error.index(float(min(error)))
 plt.plot(np.arange(LOWER,UPPER,STEP),error)
+plt.axvline(x=optimum_k, color='b', label='C='+str(optimum_k))
+plt.xlabel('C')
+plt.ylabel('Error')
+plt.legend()
 plt.savefig('ej1_graphs.2.1.png')
 plt.show()
 plt.clf()
 
-print(min(error))
-optimum_k=LOWER+STEP*error.index(float(min(error)))
-print("min error found at k="+str(optimum_k))
+# print(min(error))
+
+# print("min error found at k="+str(optimum_k))
 
 def f(x):
     B=(300/0.3)*(9.81)**0.5
@@ -121,10 +128,10 @@ print(mean_radii)
 plt.errorbar(scatterx,scattery,yerr=scatterError,fmt='o')
 x=np.arange(0.15,0.26,0.01)
 plt.plot(x,f(x),color='red')
-plt.xlabel('D')
-plt.ylabel('Flujo de particulas cada 10000 DT')
-plt.show()
+plt.xlabel('D (m)')
+plt.ylabel('Flujo de particulas (m/s)')
 plt.savefig('ej1_graphs.2.2.png')
+plt.show()
 plt.clf()
 
 
@@ -132,33 +139,37 @@ plt.clf()
 
 data=pd.read_csv('dynamic_output_energy.txt',delimiter=',')
 
+xAxis=[]
+for i in range(0,320000,1):
+    xAxis.append(i*DT)
 
-# plt.plot(range(0,320000,1),data['D0'],label='D=0.15')
-# plt.plot(range(0,320000,1),data['D1'],label='D=0.1833')
-# plt.plot(range(0,320000,1),data['D2'],label='D=0.2166')
-# plt.plot(range(0,320000,1),data['D3'],label='D=0.25')
-# plt.xlabel('DT')
-# plt.ylabel('Energia')
-# plt.legend()
-# plt.yscale('log')
-# plt.savefig('ej1_graphs.3.1.png')
-# plt.clf()
+plt.plot(xAxis,data['D0'],label='D=0.15')
+plt.plot(xAxis,data['D1'],label='D=0.1833')
+plt.plot(xAxis,data['D2'],label='D=0.2166')
+plt.plot(xAxis,data['D3'],label='D=0.25')
+plt.xlabel('Tiempo de simulacion (s)')
+plt.ylabel('Energia (j)')
+plt.legend()
+plt.yscale('log')
+plt.savefig('ej1_graphs.3.1.png')
+plt.show()
+plt.clf()
 
 
 # ===================================EJ4========================================
 
 data=pd.read_csv('dynamic_output_closed_energy.txt',delimiter=',')
 
-# plt.plot(range(0,320000,1),data['KT1'],label='KT=KN')
-# plt.plot(range(0,320000,1),data['KT2'],label='KT=2KN')
-# plt.plot(range(0,320000,1),data['KT3'],label='KT=3KN')
-# plt.xlabel('DT')
-# plt.ylabel('Energia')
-# plt.legend()
-# plt.yscale('log')
-# plt.show()
-# plt.savefig('ej1_graphs.4.1.png')
-# plt.clf()
+plt.plot(xAxis,data['KT1'],label='KT=KN')
+plt.plot(xAxis,data['KT2'],label='KT=2KN')
+plt.plot(xAxis,data['KT3'],label='KT=3KN')
+plt.xlabel('Tiempo de simulacion (s)')
+plt.ylabel('Energia (j)')
+plt.legend()
+plt.yscale('log')
+plt.savefig('ej1_graphs.4.1.png')
+plt.show()
+plt.clf()
 
 
 run1=data['KT1'].to_list()
@@ -176,8 +187,8 @@ scatterError=[stat.stdev(run1),stat.stdev(run2),stat.stdev(run3)]
 
 plt.errorbar(scatterx,scattery,yerr=scatterError,fmt='o')
 plt.xlabel('KT')
-plt.yscale('log')
-plt.ylabel('Energia Total en reposo')
+# plt.yscale('log')
+plt.ylabel('Energia Total (j)')
 plt.savefig('ej1_graphs.4.2.png')
 plt.show()
 plt.clf()
