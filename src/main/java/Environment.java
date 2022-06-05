@@ -7,7 +7,7 @@ import java.util.Random;
 public class Environment {
 
     private static final double KN = Math.pow(10,5);
-    private static final double KT = 2*KN;
+    private static double KT = 2*KN;
     private double deltaT;
     private double L,W,D;
     List<Particle> particles;
@@ -164,12 +164,13 @@ public class Environment {
                 previousParticlesStatus.get(i).setFy(0);
 
                 recentlyRespawned.add(p);
+                respawnCount++;
 
 
             }
 
         }
-        respawnCount+=recentlyRespawned.size();
+//        respawnCount+=recentlyRespawned.size();
         if (count!=0&&count%100==0){
             flowrate.add(respawnCount);
             respawnCount=0;
@@ -198,10 +199,17 @@ public class Environment {
     int count = 0;
 
     public boolean stopCriteria(){
-        return count++ == 80000;
+        return count++ == 320000;
     }
 
     public List<Integer> getFlowrate() {
         return flowrate;
+    }
+
+    public static double getKN() {
+        return KN;
+    }
+    public void setKt(double kt){
+        KT=kt;
     }
 }
