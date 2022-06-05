@@ -1,8 +1,6 @@
 import pandas as pd
 import math
 import numpy as np
-from cProfile import label
-from cmath import sqrt
 import statistics as stat
 import csv
 import matplotlib.pyplot as plt
@@ -35,18 +33,24 @@ xAxis=[]
 for i in range(len(run1)):
     xAxis.append(i*10000)
 
+for i in range(len(run1)):
+    run1[i]=run1[i]/( 0.1 * (0.01 / 10**5)**0.5 * 0.3*10000)
+    run2[i]=run2[i]/( 0.1 * (0.01 / 10**5)**0.5 * 0.3*10000)
+    run3[i]=run3[i]/( 0.1 * (0.01 / 10**5)**0.5 * 0.3*10000)
+    run4[i]=run4[i]/( 0.1 * (0.01 / 10**5)**0.5 * 0.3*10000)
 
   
 
-# plt.plot(xAxis,run1,label='D=0.15')
-# plt.plot(xAxis,run2,label='D=0.1833')
-# plt.plot(xAxis,run3,label='D=0.2166')
-# plt.plot(xAxis,run4,label='D=0.25')
-# plt.xlabel('DT')
-# plt.ylabel('Flujo de particulas cada 10000 DT')
-# # plt.show()
-# plt.savefig('ej1_graphs.1.1.png')
-# plt.clf()
+plt.plot(xAxis,run1,label='D=0.15')
+plt.plot(xAxis,run2,label='D=0.1833')
+plt.plot(xAxis,run3,label='D=0.2166')
+plt.plot(xAxis,run4,label='D=0.25')
+plt.xlabel('DT')
+plt.ylabel('Flujo de particulas cada 10000 DT')
+plt.show()
+plt.savefig('ej1_graphs.1.1.png')
+plt.clf()
+
 
 for i in range(7):
     run1.pop(0)
@@ -58,11 +62,12 @@ scatterx=[0.15,0.1833,0.2166,0.25]
 scattery=[stat.mean(run1),stat.mean(run2),stat.mean(run3),stat.mean(run4)]
 scatterError=[stat.stdev(run1),stat.stdev(run2),stat.stdev(run3),stat.stdev(run4)]
 
-# plt.errorbar(scatterx,scattery,yerr=scatterError,fmt='o')
-# plt.xlabel('D')
-# plt.ylabel('Flujo de particulas cada 10000 DT')
-# plt.savefig('ej1_graphs.1.2.png')
-# plt.clf()
+plt.errorbar(scatterx,scattery,yerr=scatterError,fmt='o')
+plt.xlabel('D')
+plt.ylabel('Flujo de particulas cada 10000 DT')
+plt.savefig('ej1_graphs.1.2.png')
+plt.show()
+plt.clf()
 
 
 
@@ -77,7 +82,7 @@ header=next(csvreader)
 for value in csvreader:
     particles.append(float(value.__getitem__(2)))
 file.close()
-mean_radii=stat.fmean(particles)
+mean_radii=stat.mean(particles)
 
 D=[0.15,0.1833,0.2166,0.25]
 expected_values=scattery;
@@ -91,15 +96,16 @@ def Error(diam,k,expected):
     return error
 
 error=[]
-LOWER=16
-UPPER=17
-STEP=0.001
+LOWER=2
+UPPER=5
+STEP=0.01
 for i in np.arange(LOWER,UPPER,STEP):
     error.append(Error(D,i,expected_values))
 
-# plt.plot(np.arange(LOWER,UPPER,STEP),error)
-# plt.savefig('ej1_graphs.2.1.png')
-# plt.clf()
+plt.plot(np.arange(LOWER,UPPER,STEP),error)
+plt.savefig('ej1_graphs.2.1.png')
+plt.show()
+plt.clf()
 
 print(min(error))
 optimum_k=LOWER+STEP*error.index(float(min(error)))
@@ -110,14 +116,16 @@ def f(x):
     aux=(abs(x-optimum_k*mean_radii))**1.5
     return B*aux
 
+print(mean_radii)
 
-# plt.errorbar(scatterx,scattery,yerr=scatterError,fmt='o')
-# x=np.arange(0.15,0.25,0.01)
-# plt.plot(x,f(x),color='red')
-# plt.xlabel('D')
-# plt.ylabel('Flujo de particulas cada 10000 DT')
-# plt.savefig('ej1_graphs.2.2.png')
-# plt.clf()
+plt.errorbar(scatterx,scattery,yerr=scatterError,fmt='o')
+x=np.arange(0.15,0.26,0.01)
+plt.plot(x,f(x),color='red')
+plt.xlabel('D')
+plt.ylabel('Flujo de particulas cada 10000 DT')
+plt.show()
+plt.savefig('ej1_graphs.2.2.png')
+plt.clf()
 
 
 # ===================================EJ3========================================
