@@ -67,7 +67,7 @@ scatterError=[stat.stdev(run1),stat.stdev(run2),stat.stdev(run3),stat.stdev(run4
 
 
 
-
+# ===================================EJ2========================================
 
 
 file = open("dynamic_input.txt")
@@ -111,14 +111,16 @@ def f(x):
     return B*aux
 
 
-plt.errorbar(scatterx,scattery,yerr=scatterError,fmt='o')
-x=np.arange(0.15,0.25,0.01)
-plt.plot(x,f(x),color='red')
-plt.xlabel('D')
-plt.ylabel('Flujo de particulas cada 10000 DT')
-plt.savefig('ej1_graphs.2.2.png')
-plt.clf()
+# plt.errorbar(scatterx,scattery,yerr=scatterError,fmt='o')
+# x=np.arange(0.15,0.25,0.01)
+# plt.plot(x,f(x),color='red')
+# plt.xlabel('D')
+# plt.ylabel('Flujo de particulas cada 10000 DT')
+# plt.savefig('ej1_graphs.2.2.png')
+# plt.clf()
 
+
+# ===================================EJ3========================================
 
 data=pd.read_csv('dynamic_output_energy.txt',delimiter=',')
 
@@ -133,3 +135,41 @@ data=pd.read_csv('dynamic_output_energy.txt',delimiter=',')
 # plt.yscale('log')
 # plt.savefig('ej1_graphs.3.1.png')
 # plt.clf()
+
+
+# ===================================EJ4========================================
+
+data=pd.read_csv('dynamic_output_closed_energy.txt',delimiter=',')
+
+# plt.plot(range(0,320000,1),data['KT1'],label='KT=KN')
+# plt.plot(range(0,320000,1),data['KT2'],label='KT=2KN')
+# plt.plot(range(0,320000,1),data['KT3'],label='KT=3KN')
+# plt.xlabel('DT')
+# plt.ylabel('Energia')
+# plt.legend()
+# plt.yscale('log')
+# plt.show()
+# plt.savefig('ej1_graphs.4.1.png')
+# plt.clf()
+
+
+run1=data['KT1'].to_list()
+run2=data['KT2'].to_list()
+run3=data['KT3'].to_list()
+
+
+run1=run1[150000:]
+run2=run2[150000:]
+run3=run1[150000:]
+
+scatterx=[10**5,2*10**5,3*10**5]
+scattery=[stat.mean(run1),stat.mean(run2),stat.mean(run3)]
+scatterError=[stat.stdev(run1),stat.stdev(run2),stat.stdev(run3)]
+
+plt.errorbar(scatterx,scattery,yerr=scatterError,fmt='o')
+plt.xlabel('KT')
+plt.yscale('log')
+plt.ylabel('Energia Total en reposo')
+plt.savefig('ej1_graphs.4.2.png')
+plt.show()
+plt.clf()
