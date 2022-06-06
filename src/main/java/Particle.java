@@ -86,51 +86,7 @@ public class Particle {
 
 
 
-    private double calculateYForceProjection(List<Particle> particles, double KN,double KT,double L, double W, double D){
-        //sumamos la fuerza normal y tangencial proyectada a la componente x
 
-        //primero las particulas
-        double fAccumProjectedY = 0;
-
-        for(Particle p : particles){
-            if(this.id == p.id)
-                continue;
-
-            double normalVersorX = (p.x - this.x)  /
-                    (Math.sqrt(Math.pow(p.x-this.x,2) + Math.pow(p.y-this.y,2)));
-
-            double normalVersorY = (p.y - this.y)  /
-                    (Math.sqrt(Math.pow(p.x-this.x,2) + Math.pow(p.y-this.y,2)));
-            fAccumProjectedY += getFn(p,KN) * normalVersorY;
-            fAccumProjectedY += getFt(p,KT) *  normalVersorX;
-
-        }
-
-        //ahora las paredes
-
-        double superposition;
-        double normalVersorX,normalVersorY;
-
-        superposition = this.getRadius() - this.y;
-        if (superposition > 0 && this.y > 0 && this.x < (W/2 - D/2)) {
-            //Lowerleft
-            normalVersorY = (0 - this.y)  /
-                    (Math.sqrt(Math.pow(0-this.y,2)));
-
-            fAccumProjectedY += -1*KN*superposition*normalVersorY;
-        } else {
-            //lower right
-            superposition = this.getRadius() - this.y;
-            if (superposition > 0 && this.y > 0 && this.x > (W/2 + D/2)) {
-                normalVersorY = (0 - this.y)  /
-                        (Math.sqrt(Math.pow(0-this.y,2)));
-                fAccumProjectedY += -1*KN*superposition*normalVersorY;
-            }
-        }
-
-
-        return fAccumProjectedY + this.mass * (- 9.80665);
-    }
 
 
     private double[] calculateParticlesAndWallForces(List<Particle> particles, double KN,double KT,double L, double W, double D){

@@ -13,8 +13,7 @@ public class Main {
 
         DecimalFormat df = new DecimalFormat("#.0000",
                 DecimalFormatSymbols.getInstance(Locale.US));
-        File file = new File("dynamic_output.txt");
-        File fileOvito = new File("ovito0.xyz"); //TODO sacar
+        File fileOvito = new File("ovito.xyz"); //TODO sacar
         PrintWriter pw = new PrintWriter(fileOvito);
         pw.println(environment.getParticles().size());
         pw.println();
