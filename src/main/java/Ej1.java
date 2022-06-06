@@ -30,7 +30,7 @@ public class Ej1 {
                 environment.evolve();
 
             }
-            for (Integer flow: environment.getFlowrate()           ) {
+            for (Integer flow: environment.getFlowrate()) {
                 pw.println(flow);
             }
 
@@ -54,7 +54,7 @@ public class Ej1 {
 
                 environment.evolve();
                 double kineticEnergytotal=0;
-                for (Particle particle:environment.particles) {
+                for (Particle particle:environment.getParticles()) {
                     kineticEnergytotal+=0.5*particle.getMass()*(Math.pow(particle.getVx(),2)+Math.pow(particle.getVy(),2));
                 }
                 particleListList.get(i).add(kineticEnergytotal);
@@ -90,7 +90,7 @@ public class Ej1 {
 
                 environment.evolve();
                 double kineticEnergytotal=0;
-                for (Particle particle:environment.particles) {
+                for (Particle particle:environment.getParticles()) {
                     kineticEnergytotal+=0.5*particle.getMass()*(Math.pow(particle.getVx(),2)+Math.pow(particle.getVy(),2));
                 }
                 particleListList.get(i-1).add(kineticEnergytotal);

@@ -1,4 +1,3 @@
-import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,14 +5,13 @@ import java.util.Random;
 
 public class Environment {
 
-    private static final double KN = Math.pow(10,5);
+    private static double KN = Math.pow(10,5);
     private static double KT = 2*KN;
     private double deltaT;
     private double L,W,D;
-    List<Particle> particles;
-    List<Particle> previousParticlesStatus;
-    List<Particle> recentlyRespawned;
-    Particle particleLeft, particleRight;
+    private List<Particle> particles;
+    private List<Particle> previousParticlesStatus;
+    private Particle particleLeft, particleRight;
 
     List<Integer> flowrate;
     private int respawnCount=0;
@@ -44,7 +42,6 @@ public class Environment {
                     rxAnterior,ryAnterior,vxAnterior,vyAnterior));
         }
 
-        recentlyRespawned = new ArrayList<>();
         flowrate=new ArrayList<>();
 
 
@@ -60,7 +57,7 @@ public class Environment {
         while(!foundPlace) {
             overlap=false;
             auxParticle.setX(p.getRadius() + (W - 2 * p.getRadius()) * random.nextDouble());
-            auxParticle.setY(L*0.8 + p.getRadius() + (L*0.45) * random.nextDouble());
+            auxParticle.setY(L*0.45 + p.getRadius() + (L*0.55) * random.nextDouble());
             for(Particle other : particles) {
                 if(other.getId() != auxParticle.getId() && auxParticle.overlaps(other)) {
                     overlap = true;
@@ -109,8 +106,7 @@ public class Environment {
 
             nextStep.add(futureParticle);
 
-            if(futureParticle.getY() < L*0.8)
-                recentlyRespawned.remove(futureParticle);
+
         }
         for (int i = 0; i < nextStep.size() ; i++) {
             Particle futureParticle = nextStep.get(i);
@@ -163,7 +159,6 @@ public class Environment {
                 previousParticlesStatus.get(i).setFx(0);
                 previousParticlesStatus.get(i).setFy(0);
 
-                recentlyRespawned.add(p);
                 respawnCount++;
 
 
@@ -174,7 +169,7 @@ public class Environment {
         if (count!=0&&count%100==0){
             flowrate.add(respawnCount);
             respawnCount=0;
-            System.out.println(count);
+          //  System.out.println(count);
         }
 
 
@@ -191,7 +186,7 @@ public class Environment {
             p.updateForces(particles, new Particle[]{particleLeft,particleRight}, KN,KT,L,W,D);
         }
 
-        System.out.println("termine");
+       // System.out.println("termine");
     }
 
 
@@ -199,11 +194,15 @@ public class Environment {
     int count = 0;
 
     public boolean stopCriteria(){
-        return count++ == 320000;
+        return count++ == 180000;
     }
 
     public List<Integer> getFlowrate() {
         return flowrate;
+    }
+
+    public List<Particle> getParticles() {
+        return particles;
     }
 
     public static double getKN() {

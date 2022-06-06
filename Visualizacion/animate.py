@@ -62,7 +62,9 @@ pipeline.modifiers.append(AffineTransformationModifier(
 ))
 pipeline.modifiers.append(ColorCodingModifier(
     property = 'Velocity Magnitude',
-    gradient = ColorCodingModifier.Hot()
+    gradient = ColorCodingModifier.BlueWhiteRed(),
+    end_value = 3,
+    start_value = 0
 ))
 pipeline.add_to_scene()
 vp = Viewport(type = Viewport.Type.Top)
@@ -70,4 +72,4 @@ vp.zoom_all()
 
 add_walls(vp)
 #vp.render_image(size=(800,600), filename="image.png")
-vp.render_anim(size=(800,600), filename="animation.avi", fps=60, every_nth=50) 
+vp.render_anim(size=(800,600), filename="animation.avi",  fps=60, every_nth=200)

@@ -14,22 +14,22 @@ public class Main {
         DecimalFormat df = new DecimalFormat("#.0000",
                 DecimalFormatSymbols.getInstance(Locale.US));
         File file = new File("dynamic_output.txt");
-        File fileOvito = new File("ovito.xyz"); //TODO sacar
+        File fileOvito = new File("ovito0.xyz"); //TODO sacar
         PrintWriter pw = new PrintWriter(fileOvito);
-        pw.println(environment.particles.size());
+        pw.println(environment.getParticles().size());
         pw.println();
 
-        for(Particle p : environment.particles)
+        for(Particle p : environment.getParticles())
             pw.printf("%s %s %s %s %s\n", df.format(p.getX()),
                     df.format(p.getY()),df.format(p.getVx()),df.format(p.getVy()),
                     df.format(p.getRadius()));
         while(!environment.stopCriteria()){
 
             environment.evolve();
-            pw.println(environment.particles.size());
+            pw.println(environment.getParticles().size());
             pw.println();
 
-            for(Particle p : environment.particles)
+            for(Particle p : environment.getParticles())
                 pw.printf("%s %s %s %s %s\n", df.format(p.getX()),
                         df.format(p.getY()),df.format(p.getVx()),df.format(p.getVy()),
                         df.format(p.getRadius()));
