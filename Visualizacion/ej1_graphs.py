@@ -161,9 +161,10 @@ plt.clf()
 
 data=pd.read_csv('dynamic_output_closed_energy.txt',delimiter=',')
 
-plt.plot(xAxis,data['KT1'],label='KT=10^5')
-plt.plot(xAxis,data['KT2'],label='KT=2*10^5')
 plt.plot(xAxis,data['KT3'],label='KT=3*10^5')
+plt.plot(xAxis,data['KT2'],label='KT=2*10^5')
+plt.plot(xAxis,data['KT1'],label='KT=10^5')
+
 plt.xlabel('Tiempo de simulacion (s)')
 plt.ylabel('Energia (j)')
 plt.legend()
